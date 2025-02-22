@@ -87,29 +87,35 @@ class AdminController extends Controller
         return view('admin.add_book', compact('data'));
     }
     public function upload_book(Request $request)
-{
-    // Cek data yang masuk
-    // dd($request->all()); 
+    {
+        // Cek data yang masuk
+        // dd($request->all()); 
 
-    $data = new Book;
-    $data->judul = $request->judul;
-    $data->penulis = $request->penulis;
-    $data->penerbit = $request->penerbit;
-    $data->deskripsi = $request->deskripsi;
-    $data->tahun_terbit = $request->tahun_terbit;
-    $data->category_id = $request->kategori; // Ini yang dipakai!
+        $data = new Book;
+        $data->judul = $request->judul;
+        $data->penulis = $request->penulis;
+        $data->penerbit = $request->penerbit;
+        $data->deskripsi = $request->deskripsi;
+        $data->tahun_terbit = $request->tahun_terbit;
+        $data->category_id = $request->kategori; // Ini yang dipakai!
 
-    $data->stock = $request->stock;
+        $data->stock = $request->stock;
 
-    if ($request->hasFile('book_img')) {
-        $file = $request->file('book_img');
-        $filename = time() . '.' . $file->getClientOriginalName();
-        $file->move('uploads/book_images/', $filename);
-        $data->book_img = 'uploads/book_images/' . $filename;
+        if ($request->hasFile('book_img')) {
+            $file = $request->file('book_img');
+            $filename = time() . '.' . $file->getClientOriginalName();
+            $file->move('uploads/book_images/', $filename);
+            $data->book_img = 'uploads/book_images/' . $filename;
+        }
+
+        $data->save(); // Tidak error lagi!
+
+        return redirect()->back()->with('success', 'Buku berhasil ditambahkan!');
     }
-
-    $data->save(); // Tidak error lagi!
-
-    return redirect()->back()->with('success', 'Buku berhasil ditambahkan!');
+    public function view_books()
+{
+    $books = Book::with('category')->orderBy('created_at', 'desc')->get(); // Ambil buku terbaru
+    return view('admin/view_books', compact('books'));
 }
+
 }

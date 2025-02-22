@@ -43,3 +43,6 @@ Route::post('/update_category/{id}', [AdminController::class, 'update_category']
 Route::get('/add_book', [AdminController::class, 'add_book']);
 
 Route::post('/upload_book', [AdminController::class, 'upload_book']);
+
+Route::get('/view_books', [AdminController::class, 'view_books'])->name('view_books');
+

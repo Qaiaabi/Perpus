@@ -3,139 +3,176 @@
 
 <head>
     @include('admin.css')
-
-
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome untuk ikon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <style>
-        /* Styling untuk tabel */
-        table {
+        .form-header {
+            background-color: #343a40;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .table-container {
+            background-color: #fff;
+            border-radius: 0 0 10px 10px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            border: 2px solid #dee2e6;
+            font-size: 16px;
         }
 
-        table,
-        th,
-        td {
-            border: 1px solid #ddd;
-        }
-
-        th,
-        td {
-            padding: 12px;
+        .custom-table th, .custom-table td {
+            padding: 16px 20px;
             text-align: left;
         }
 
-        th {
-            background-color: #343a40;
-            color: white;
-            text-align: center;
+        .custom-table th {
+            background-color: #495057;
+            color: #fff;
+            font-weight: 600;
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .custom-table tr:hover {
+            background-color: #f1f3f5;
         }
 
-        tr:hover {
-            background-color: #ddd;
+        .action-buttons .btn {
+            margin: 0 4px;
+            padding: 8px 14px;
+            font-size: 15px;
+        }
+
+        .action-buttons .btn i {
+            margin-right: 4px;
         }
     </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     @include('admin.sidebar')
 
-    <!-- Page Content -->
     <div id="page-content-wrapper">
         @include('admin.navbar')
 
-        <div class="container mt-4">
+        <div class="container mt-6">
+            <div class="row justify-content-center">
+                <div class="col-lg-14">
+                    @if(session()->has('message'))
+                    <div class="alert alert-success">{{ session()->get('message') }}</div>
+                    @endif
 
-            <div>
-                @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
+                    @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+
+                    @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+
+                    <div class="form-header mb-0">
+                        <h5 class="m-0">List Buku</h5>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="booksTable" class="table custom-table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Gambar</th>
+                                    <th>Judul</th>
+                                    <th>Penulis</th>
+                                    <th>Penerbit</th>
+                                    <th>Tahun Terbit</th>
+                                    <th>Kategori</th>
+                                    <th>Stok</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($books as $index => $book)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>
+                                        @if($book->book_img)
+                                        <img src="{{ asset($book->book_img) }}" width="150" height="100" alt="Cover Buku" class="rounded">
+                                        @else
+                                        <span class="text-muted">Tidak ada gambar</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $book->judul }}</td>
+                                    <td>{{ $book->penulis }}</td>
+                                    <td>{{ $book->penerbit }}</td>
+                                    <td>{{ $book->tahun_terbit }}</td>
+                                    <td>{{ $book->category->cat_title ?? '-' }}</td>
+                                    <td>{{ $book->stock }}</td>
+                                    <td class="action-buttons">
+                                        <a href=" " class="btn btn-sm btn-warning"><i class="fas fa-edit"></i>Edit</a>
+                                        <button class="btn btn-sm btn-danger delete-btn" data-id=" "><i class="fas fa-trash"></i>Hapus</button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="9" class="text-center">Tidak ada buku tersedia.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                @endif
-
             </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Gambar</th>
-                        <th>Judul</th>
-                        <th>Kategori</th>
-                        <th>Penulis</th>
-                        <th>Penerbit</th>
-                        <th>Tahun Terbit</th>
-                        <th>Deskripsi</th>
-                        <th>Stock</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($books as $book)
-                    <tr>
-                        <td>
-                            @if($book->gambar)
-                            <img src="{{ asset('storage/' . $book->gambar) }}" width="150">
-                            @else
-                            <span>Tidak ada gambar</span>
-                            @endif
-                        </td>
-                        <td>{{ $book->judul }}</td>
-                        <td>{{ $book->category->cat_title ?? 'Kategori Tidak Ada' }}</td>
-                        <td>{{ $book->penulis }}</td>
-                        <td>{{ $book->penerbit }}</td>
-                        <td>{{ $book->tahun_terbit }}</td>
-                        <td>{{ $book->deskripsi }}</td>
-                        <td>{{ $book->stock }}</td>
-
-
-                        <td style="width: 60px;" class="action-buttons">
-                            <a style="margin: 5px;" href="{{ url('edit_category', $book->id) }}" class="btn btn-warning">
-                                <i class="bi bi-pencil-square"></i> Edit
-                            </a>
-                            <button style="margin: 5px;" class="btn btn-danger delete-btn" data-url="{{ url('books_delete', $book->id) }}">
-                                <i class="bi bi-trash"></i> Hapus
-                            </button>
-                        </td>
-                    </tr>
-                    @endforeach
-
-                </tbody>
-            </table>
-
         </div>
 
-        <!-- Footer -->
         @include('admin.footer')
     </div>
-</body>
 
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const deleteButtons = document.querySelectorAll(".delete-btn");
+    <script>
+        $(document).ready(function() {
+            $('#booksTable').DataTable({
+                pageLength: 10,
+                responsive: true,
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ hingga _END_ dari _TOTAL_ buku",
+                    zeroRecords: "Buku tidak ditemukan.",
+                    paginate: {
+                        previous: "<",
+                        next: ">"
+                    }
+                }
+            });
 
-        deleteButtons.forEach(button => {
-            button.addEventListener("click", function() {
-                const deleteUrl = this.getAttribute("data-url");
+            $('.delete-btn').click(function() {
+                const bookId = $(this).data('id');
+                const deleteUrl = "{{ url('books/delete') }}/" + bookId;
 
                 Swal.fire({
-                    title: "Apakah Anda yakin?",
-                    text: "Kategori yang dihapus tidak dapat dikembalikan!",
-                    icon: "warning",
+                    title: 'Apakah Anda yakin?',
+                    text: "Buku yang dihapus tidak dapat dikembalikan.",
+                    icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#6c757d",
-                    confirmButtonText: "Ya, hapus!",
-                    cancelButtonText: "Batal"
+                    confirmButtonColor: '#e3342f',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = deleteUrl;
@@ -143,7 +180,7 @@
                 });
             });
         });
-    });
-</script>
+    </script>
+</body>
 
 </html>
