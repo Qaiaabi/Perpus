@@ -129,4 +129,37 @@ class AdminController extends Controller
     return response()->json(['success' => true, 'message' => 'Buku berhasil dihapus!']);
 }
 
+public function edit_book($id) {
+    $data = Book::findOrFail($id);
+    $categories = Category::all(); // Untuk menampilkan kategori dalam dropdown
+    return view('admin.edit_book', compact('data', 'categories'));
+}
+
+public function update_book(Request $request, $id) {
+    $data = Book::findOrFail($id);
+
+    $data->judul = $request->judul;
+    $data->penulis = $request->penulis;
+    $data->penerbit = $request->penerbit;
+    $data->deskripsi = $request->deskripsi;
+    $data->tahun_terbit = $request->tahun_terbit;
+    $data->stock = $request->stock;
+    $data->category_id = $request->kategori;
+
+    // Update gambar jika ada file baru
+    if ($request->hasFile('book_img')) {
+        if ($data->book_img && file_exists(public_path($data->book_img))) {
+            unlink(public_path($data->book_img)); // Hapus gambar lama
+        }
+        $file = $request->file('book_img');
+        $filename = time() . '.' . $file->getClientOriginalName();
+        $file->move('uploads/book_images/', $filename);
+        $data->book_img = 'uploads/book_images/' . $filename;
+    }
+
+    $data->save();
+
+    return redirect()->route('view_books')->with('success', 'Buku berhasil diperbarui!');
+}
+
 }

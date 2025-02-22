@@ -39,12 +39,16 @@ Route::get('/cat_delete/{id}', action: [AdminController::class, 'cat_delete']);
 Route::get('/edit_category/{id}', [AdminController::class, 'edit_category']);
 Route::post('/update_category/{id}', [AdminController::class, 'update_category']);
 
-
+//menambahkan buku
 Route::get('/add_book', [AdminController::class, 'add_book']);
-
+//mengupload buku
 Route::post('/upload_book', [AdminController::class, 'upload_book']);
-
+//melihat buku
 Route::get('/view_books', [AdminController::class, 'view_books'])->name('view_books');
-
+//menghapus buku
 Route::post('/delete_book/{id}', [AdminController::class, 'delete_book'])->name('delete_book');
 
+// Tampilkan form edit buku
+Route::get('/edit_book/{id}', [AdminController::class, 'edit_book'])->name('edit_book');
+// Update buku setelah form disubmit
+Route::post('/update_book/{id}', [AdminController::class, 'update_book'])->name('update_book');
