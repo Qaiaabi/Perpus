@@ -33,9 +33,10 @@
             font-size: 16px;
         }
 
-        .custom-table th, .custom-table td {
+        .custom-table th,
+        .custom-table td {
             padding: 16px 20px;
-            text-align: left;
+            text-align: center;
         }
 
         .custom-table th {
@@ -66,9 +67,9 @@
     <div id="page-content-wrapper">
         @include('admin.navbar')
 
-        <div class="container mt-6">
+        <div style="margin-top: 20px;" class="container mt-12">
             <div class="row justify-content-center">
-                <div class="col-lg-14">
+                <div>
                     @if(session()->has('message'))
                     <div class="alert alert-success">{{ session()->get('message') }}</div>
                     @endif
@@ -81,7 +82,7 @@
                     <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
 
-                    <div class="form-header mb-0">
+                    <div class="form-header mb-14">
                         <h5 class="m-0">List Buku</h5>
                     </div>
 
@@ -118,8 +119,11 @@
                                     <td>{{ $book->category->cat_title ?? '-' }}</td>
                                     <td>{{ $book->stock }}</td>
                                     <td class="action-buttons">
-                                        <a href=" " class="btn btn-sm btn-warning"><i class="fas fa-edit"></i>Edit</a>
-                                        <button class="btn btn-sm btn-danger delete-btn" data-id=" "><i class="fas fa-trash"></i>Hapus</button>
+                                        <a href=" " class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>Edit
+                                        </a>
+                                        <!-- Tombol Hapus -->
+                                        <button class="btn btn-danger btn-sm delete-book" data-id="{{ $book->id }}">Hapus</button>
                                     </td>
                                 </tr>
                                 @empty
@@ -144,38 +148,43 @@
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            $('#booksTable').DataTable({
-                pageLength: 10,
-                responsive: true,
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ entri",
-                    info: "Menampilkan _START_ hingga _END_ dari _TOTAL_ buku",
-                    zeroRecords: "Buku tidak ditemukan.",
-                    paginate: {
-                        previous: "<",
-                        next: ">"
-                    }
-                }
-            });
-
-            $('.delete-btn').click(function() {
-                const bookId = $(this).data('id');
-                const deleteUrl = "{{ url('books/delete') }}/" + bookId;
+        document.querySelectorAll('.delete-book').forEach(button => {
+            button.addEventListener('click', function() {
+                const bookId = this.dataset.id;
 
                 Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Buku yang dihapus tidak dapat dikembalikan.",
+                    title: 'Yakin ingin menghapus buku ini?',
+                    text: "Tindakan ini tidak dapat dibatalkan!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#e3342f',
+                    confirmButtonColor: '#d33',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
+                    cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = deleteUrl;
+                        fetch(`{{ url('/delete_book') }}/${bookId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Terhapus!',
+                                        text: data.message,
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+
+                                    // 🔄 Auto refresh setelah 1.6 detik
+                                    setTimeout(() => location.reload(), 1600);
+                                }
+                            });
                     }
                 });
             });

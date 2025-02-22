@@ -88,17 +88,14 @@ class AdminController extends Controller
     }
     public function upload_book(Request $request)
     {
-        // Cek data yang masuk
-        // dd($request->all()); 
-
+        // Simpan data buku
         $data = new Book;
         $data->judul = $request->judul;
         $data->penulis = $request->penulis;
         $data->penerbit = $request->penerbit;
         $data->deskripsi = $request->deskripsi;
         $data->tahun_terbit = $request->tahun_terbit;
-        $data->category_id = $request->kategori; // Ini yang dipakai!
-
+        $data->category_id = $request->kategori;
         $data->stock = $request->stock;
 
         if ($request->hasFile('book_img')) {
@@ -108,14 +105,28 @@ class AdminController extends Controller
             $data->book_img = 'uploads/book_images/' . $filename;
         }
 
-        $data->save(); // Tidak error lagi!
+        $data->save();
 
-        return redirect()->back()->with('success', 'Buku berhasil ditambahkan!');
+        // Redirect ke halaman view_books dengan pesan sukses
+        return redirect()->route('view_books')->with('success', 'Buku berhasil ditambahkan!');
     }
+
     public function view_books()
-{
-    $books = Book::with('category')->orderBy('created_at', 'desc')->get(); // Ambil buku terbaru
-    return view('admin/view_books', compact('books'));
+    {
+        $books = Book::with('category')->orderBy('created_at', 'desc')->get(); // Ambil buku terbaru
+        return view('admin/view_books', compact('books'));
+    }
+    public function delete_book(Request $request, $id){
+    $book = Book::findOrFail($id);
+
+    // Hapus gambar jika ada
+    if ($book->book_img && file_exists(public_path($book->book_img))) {
+        unlink(public_path($book->book_img));
+    }
+
+    $book->delete();
+
+    return response()->json(['success' => true, 'message' => 'Buku berhasil dihapus!']);
 }
 
 }

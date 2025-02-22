@@ -46,3 +46,5 @@ Route::post('/upload_book', [AdminController::class, 'upload_book']);
 
 Route::get('/view_books', [AdminController::class, 'view_books'])->name('view_books');
 
+Route::post('/delete_book/{id}', [AdminController::class, 'delete_book'])->name('delete_book');
+
