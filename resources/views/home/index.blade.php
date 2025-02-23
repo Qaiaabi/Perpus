@@ -7,9 +7,6 @@
 
 <body>
   <!-- Navbar -->
-   
-  @include('home.css')
-  
   @include('home.navbar')
   
   @include('home.main')

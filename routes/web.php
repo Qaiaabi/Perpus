@@ -8,14 +8,9 @@ use App\Http\Controllers\HomeController;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
-Route::get('/',[HomeController::class, 'index'] );
+Route::get('/', [HomeController::class, 'index']);
 
 Route::middleware([
     'auth:sanctum',
@@ -27,28 +22,19 @@ Route::middleware([
     })->name('dashboard');
 });
 
-route::get('/home',[AdminController::class, 'index']);
+Route::get('/home', [AdminController::class, 'index']);
 
-// Route untuk menampilkan halaman kategori
+// Route untuk kategori
 Route::get('/category_page', [AdminController::class, 'category_page']);
-// Route untuk menangani penambahan kategori
 Route::post('/add_category', [AdminController::class, 'add_category']);
-// Route untuk menghapus kategori
-Route::get('/cat_delete/{id}', action: [AdminController::class, 'cat_delete']);
-// Route untuk mengarahkan ke halaman edit 
+Route::get('/cat_delete/{id}', [AdminController::class, 'cat_delete']);
 Route::get('/edit_category/{id}', [AdminController::class, 'edit_category']);
 Route::post('/update_category/{id}', [AdminController::class, 'update_category']);
 
-//menambahkan buku
+// Route untuk buku
 Route::get('/add_book', [AdminController::class, 'add_book']);
-//mengupload buku
 Route::post('/upload_book', [AdminController::class, 'upload_book']);
-//melihat buku
 Route::get('/view_books', [AdminController::class, 'view_books'])->name('view_books');
-//menghapus buku
 Route::post('/delete_book/{id}', [AdminController::class, 'delete_book'])->name('delete_book');
-
-// Tampilkan form edit buku
 Route::get('/edit_book/{id}', [AdminController::class, 'edit_book'])->name('edit_book');
-// Update buku setelah form disubmit
 Route::post('/update_book/{id}', [AdminController::class, 'update_book'])->name('update_book');
