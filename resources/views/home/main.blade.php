@@ -19,7 +19,7 @@
 
 
 <div style="margin-top: 20px;" class="container">
-    <h1 style="text-align: center;">📖Buku Terbaru</h1>x`
+    <h1 style="text-align: center;">📖Buku Terbaru</h1>
     <div style="display: flex; justify-content: center;">
         <svg width="200" height="20" viewBox="0 0 200 25" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 15 C 50 30, 150 5, 195 15" stroke="#007bff" stroke-width="6" stroke-linecap="round" fill="none" stroke-opacity="0.8"/>
@@ -30,7 +30,7 @@
             @foreach ($data as $data)
                 <div class="swiper-slide">
                     <div class="card">
-                    <img src="{{ asset('book/' . $data->book_img) }}" alt="{{ $data->judul }}">
+                    <img src="{{ asset($data->book_img) }}" alt="{{ $data->judul }}" width="150">
                         <div class="card-content">
                             <h3>{{ $data->judul }}</h3>
                             <p>{{ $data->penulis }}</p>
